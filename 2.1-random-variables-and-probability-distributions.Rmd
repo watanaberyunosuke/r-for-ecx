@@ -1,0 +1,117 @@
+---
+title: "2.1 Random Variables and Probability Distributions"
+output: html_notebook
+toc: yes
+---
+
+Generate random sample.
+
+```{r}
+sample <- sample(1:6, 1)
+```
+
+# Probability Distributions of Discrete Random Variables
+
+Generate vector of probabilities. Set up the probability vector using the function `rep()`, which replicates a given value a specified number of times.
+
+```{r}
+probability <- rep(1/6, 6)
+
+# Plot the probability
+plot(
+  probability,
+  xlab = "Outcomes",
+  ylab = "Probability",
+  main = "Probability Distribution"
+)
+```
+
+For the **cumulative probability distribution** we need the cumulative probabilities, i.e., we need the cumulative sums of the vector probability. These sums can be computed using `cumsum()`.
+
+```{r}
+cum_probability <- cumsum(probability)
+
+plot(cum_probability,
+     xlab = "Outcome",
+     ylab = "Cumulative Probability",
+     main = "Cumulative Probability Distribution")
+```
+
+# Bernoulli Trials
+
+The set of elements from which `sample()` draws outcomes does not have to consist of numbers only. We might as well simulate coin tossing with outcomes\
+$H$(heads) and $T$(tails).
+
+```{r}
+sample(c("H", "T"), 1)
+```
+
+The result of a single coin toss is a *Bernoulli* distributed random variable.
+
+Example: toss a coin\
+10 times in a row and wonder how likely it is to end up with a 5 times heads. This is a typical example of what we call a *Bernoulli experiment* as it consists of $n = 10$ Bernoulli trials that are independent of each other and we are interested in the likelihood of observing\
+$k = 5$ successes $H$ that occur with probability $p = 0.5$ (assuming a fair coin) in each trial. Note that the order of the outcomes does not matter here.
+
+It is a well known result that the number of successes $k$ in a Bernoulli experiment follows a binomial distribution. We denote this as
+
+$$
+k \sim B(n,p)
+$$ The probability of observing $k$ success in the experiment $B(n, p)$ is given by $$
+f(k)=P(k)=\left(\begin{array}{l}
+n \\
+k
+\end{array}\right) \cdot p^k \cdot(1-p)^{n-k}=\frac{n !}{k !(n-k) !} \cdot p^k \cdot(1-p)^{n-k}
+$$ with $\left(\begin{array}{l} n \\ k \end{array}\right)$ as the binomial coefficient.
+
+In R, we use `dbinom()` which calculates `P(k|n,p)`, the probability of the binomial distribution given the parameters $x(k)$, size($n$) and prob($p$). Now compute $P(k=5|n=10, p=0.5)$, short handed as $P(k=5)$.
+
+```{r}
+dbinom(x = 5,
+       size = 10,
+       prob = 0.5
+       )
+```
+
+Now calculate $P(4 \leq k \leq 7)$
+
+```{r}
+sum(dbinom(x = 4:7, size = 10, prob = 0.5))
+```
+
+An alternative approach is to use `pbinom()`, the distribution function of the binomial distribution to compute $P(4 \leq k \leq 7) = P(k \leq 7) - P(k \leq 3)$
+
+```{r}
+# compute P(4 <= k <= 7) using 'pbinom()'
+pbinom(size = 10, prob = 0.5, q = 7) - pbinom(size = 10, prob = 0.5, q = 3)
+```
+The probability distribution of a discrete random variable is nothing but a list of all possible outcomes that can occur and their respective probabilities. In the coin tossing example we have  
+11 possible outcomes for $k$.
+
+```{r}
+k <- 0:10
+k
+```
+To visualise.
+```{r}
+probability <- dbinom(x = k,
+                      size = 10,
+                      prob = 0.5)
+
+# Plot the outcome
+plot(x = k,
+     y = probability,
+     main = "Probability Distribution Function")
+```
+Also plot the cumulative distribution function of $k$.
+```{r}
+prob <- pbinom(q = k,
+               size = 10,
+               prob = 0.5)
+
+# Plot
+plot(x = k,
+     y = prob,
+     main = "Cumulative Distribution Function")
+```
+
+# Expected Value, Mean and Variance
